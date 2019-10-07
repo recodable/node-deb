@@ -805,73 +805,82 @@ if echo "$@" | grep -q 'package-lock.json'; then
     'command line.'
 fi
 
-# copy the main files
-find "$@" -type d -print0 | {
-  while IFS= read -r -d '' dir; do
-    if ! readlink_f "$dir" | grep -Eq "^$source_dir/node_modules/.*"; then
-      log_debug "Making directory: $dir"
-      mkdir -p "$deb_dir$install_dir/$package_name/app/$dir"
-    fi
-  done
-}
-find "$@" -type f -print0 | {
-  while IFS= read -r -d '' file; do
-    if ! readlink_f "$file" | grep -Eq "$source_dir/node_modules/.*"; then
-      log_debug "Copying: $file"
-      cp -pf  "$file" "$deb_dir$install_dir/$package_name/app/$file"
-    fi
-  done
-}
+# # copy the main files
+# find "$@" -type d -print0 | {
+#   while IFS= read -r -d '' dir; do
+#     if ! readlink_f "$dir" | grep -Eq "^$source_dir/node_modules/.*"; then
+#       log_debug "Making directory: $dir"
+#       mkdir -p "$deb_dir$install_dir/$package_name/app/$dir"
+#     fi
+#   done
+# }
+# find "$@" -type f -print0 | {
+#   while IFS= read -r -d '' file; do
+#     if ! readlink_f "$file" | grep -Eq "$source_dir/node_modules/.*"; then
+#       log_debug "Copying: $file"
+#       cp -pf  "$file" "$deb_dir$install_dir/$package_name/app/$file"
+#     fi
+#   done
+# }
 
-copy_node_modules() {
-  if [ -d "$source_dir/node_modules" ]; then
-    log_debug 'Copying dir: node_modules'
-    cp -rfL "$source_dir/node_modules/" "$deb_dir$install_dir/$package_name/app/"
-  fi
-}
+# copy_node_modules() {
+#   if [ -d "$source_dir/node_modules" ]; then
+#     log_debug 'Copying dir: node_modules'
+#     cp -rfL "$source_dir/node_modules/" "$deb_dir$install_dir/$package_name/app/"
+#   fi
+# }
 
-if [[ "$install_strategy" == 'auto' ]]; then
-  if [ -d "$source_dir/node_modules" ]; then
-    if hash npm 2> /dev/null; then
-      mkdir -p "$deb_dir$install_dir/$package_name/app/node_modules"
+# if [[ "$install_strategy" == 'auto' ]]; then
+#   if [ -d "$source_dir/node_modules" ]; then
+#     if hash npm 2> /dev/null; then
+#       mkdir -p "$deb_dir$install_dir/$package_name/app/node_modules"
 
-      # this is a bash-y mess, but basically the last sed-cut-sort strips out nested node_modules in dependencies
-      for dir in $(npm ls --parseable --prod | sed -e "s/$(escape "$source_dir")//g" | grep -Ev '^$' | sed -e 's:^/node_modules/::g' | cut -d / -f 1 | sort -u); do
-        log_debug "Copying dependency: $dir"
-        cp -rf "$source_dir/node_modules/$dir" "$deb_dir$install_dir/$package_name/app/node_modules/"
-      done
+#       # this is a bash-y mess, but basically the last sed-cut-sort strips out nested node_modules in dependencies
+#       for dir in $(npm ls --parseable --prod | sed -e "s/$(escape "$source_dir")//g" | grep -Ev '^$' | sed -e 's:^/node_modules/::g' | cut -d / -f 1 | sort -u); do
+#         log_debug "Copying dependency: $dir"
+#         cp -rf "$source_dir/node_modules/$dir" "$deb_dir$install_dir/$package_name/app/node_modules/"
+#       done
 
-      if [ -f "$source_dir/node_modules/.bin" ]; then
-        cp -rfL "$source_dir/node_modules/.bin/" "$deb_dir$install_dir/$package_name/app/node_modules/.bin/"
-        # only keep the links that still point to something
-        for e in $(find "$deb_dir$install_dir/$package_name/app/node_modules/.bin/"); do
-          stat "$(readlink_f "$e")" || rm -rf "$e"
-        done
-      fi
-    else
-      copy_node_modules
-    fi
-  fi
+#       if [ -f "$source_dir/node_modules/.bin" ]; then
+#         cp -rfL "$source_dir/node_modules/.bin/" "$deb_dir$install_dir/$package_name/app/node_modules/.bin/"
+#         # only keep the links that still point to something
+#         for e in $(find "$deb_dir$install_dir/$package_name/app/node_modules/.bin/"); do
+#           stat "$(readlink_f "$e")" || rm -rf "$e"
+#         done
+#       fi
+#     else
+#       copy_node_modules
+#     fi
+#   fi
+# fi
+
+# if [[ "$install_strategy" == 'copy' ]]; then
+#   copy_node_modules
+# fi
+
+# if ! [ -f "$deb_dir$install_dir/$package_name/app/package.json" ]; then
+#   log_info "Including 'package.json' in the Debian package."
+#   cp -pf './package.json' "$deb_dir$install_dir/$package_name/app/"
+# fi
+
+# if [ -f './package-lock.json' ] && ! [ -f "$deb_dir$install_dir/$package_name/app/package-lock.json" ]; then
+#   log_info "Including 'package-lock.json' in the Debian package."
+#   cp -pf './package-lock.json' "$deb_dir$install_dir/$package_name/app/"
+# fi
+
+# if [ -f './npm-shrinkwrap.json' ] && ! [ -f "$deb_dir$install_dir/$package_name/app/npm-shrinkwrap.json" ]; then
+#   log_info "Including 'npm-shrinkwrap.json' in the Debian package."
+#   cp -pf './npm-shrinkwrap.json' "$deb_dir$install_dir/$package_name/app/"
+# fi
+
+
+## copy executable file made with zeit/pkg into install directory
+if [ -f "./$package_name" ] && ! [ -f "$deb_dir$install_dir/$package_name/$package_name" ]; then
+  log_info "Including '$package_name' executable in the Debian package."
+  cp -pf "./$package_name" "$deb_dir$install_dir/$package_name/"
 fi
 
-if [[ "$install_strategy" == 'copy' ]]; then
-  copy_node_modules
-fi
 
-if ! [ -f "$deb_dir$install_dir/$package_name/app/package.json" ]; then
-  log_info "Including 'package.json' in the Debian package."
-  cp -pf './package.json' "$deb_dir$install_dir/$package_name/app/"
-fi
-
-if [ -f './package-lock.json' ] && ! [ -f "$deb_dir$install_dir/$package_name/app/package-lock.json" ]; then
-  log_info "Including 'package-lock.json' in the Debian package."
-  cp -pf './package-lock.json' "$deb_dir$install_dir/$package_name/app/"
-fi
-
-if [ -f './npm-shrinkwrap.json' ] && ! [ -f "$deb_dir$install_dir/$package_name/app/npm-shrinkwrap.json" ]; then
-  log_info "Including 'npm-shrinkwrap.json' in the Debian package."
-  cp -pf './npm-shrinkwrap.json' "$deb_dir$install_dir/$package_name/app/"
-fi
 
 # Calculate md5sums
 log_debug 'Calculating md5 sums'
