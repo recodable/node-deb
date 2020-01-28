@@ -1,8 +1,8 @@
 {
-  "name": "node-deb",
-  "version": "0.10.8",
+  "name": "@recodable/node-deb",
+  "version": "0.10.9",
   "description": "Debian packaging for Node.js projects",
-  "author": "heartsucker <heartsucker@autistici.org>",
+  "author": "Abdoulaye Karim Taore <traore_a@outlook.com>",
   "bin": {
     "node-deb": "./node-deb"
   },
@@ -12,10 +12,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/heartsucker/node-deb.git"
+    "url": "git+https://github.com/recodable/node-deb.git"
   },
   "bugs": {
-    "url": "https://github.com/heartsucker/node-deb/issues"
+    "url": "https://github.com/recodable/node-deb/issues"
   },
   "keywords": [
     "debian",
@@ -31,7 +31,7 @@
   "preferGlobal": true,
   "private": false,
   "license": "MIT",
-  "homepage": "https://github.com/heartsucker/node-deb",
+  "homepage": "https://github.com/recodable/node-deb",
   "files": [
     "node-deb",
     "templates",
