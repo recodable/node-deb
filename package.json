@@ -1,7 +1,7 @@
 {
   "name": "@recodable/node-deb",
-  "version": "0.10.9",
-  "description": "Debian packaging for Node.js projects",
+  "version": "0.10.11",
+  "description": "Debian packaging for Node.js projects for the recodable team",
   "author": "Abdoulaye Karim Taore <traore_a@outlook.com>",
   "bin": {
     "node-deb": "./node-deb"

@@ -445,7 +445,7 @@ log_debug "The package maintainer has been set to: $package_maintainer"
 # Set the package dependencies
 if [ -z "$package_dependencies" ]; then
   package_dependencies=$(jq -r '.node_deb.dependencies' package.json)
-  default_package_dependencies="nodejs, sudo"
+  default_package_dependencies="sudo"
   if [[ "$package_dependencies" != 'null' ]]; then
     default_package_dependencies="${default_package_dependencies}, "
   else

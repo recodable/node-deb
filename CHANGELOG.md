@@ -1,5 +1,17 @@
 # CHANGELOG
 
+#### 0.10.10 2020-02-13
+- Fixed
+ - delete nodejs from .deb dependencies
+
+#### 0.10.9 2020-02-13
+- Fixed
+ - delete /app from service script template
+
+#### 0.10.8 2020-01-28
+- Removed
+  - the copy of node_modules
+
 #### 0.10.7 2018-07-16
 - Added
   - `--preinst-template` CLI option and `node_deb.templates.preinst` for Debian `preinst` templates.
